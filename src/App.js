@@ -11,7 +11,11 @@ const App = () => {
   });
   const [parentData, setParentData] = useState(null);
 
-  const PARENT_ORIGIN = 'https://vivebharath.github.io/browserapi-parent-app';
+  
+  const PARENT_URL = 'https://vivebharath.github.io/browserapi-parent-app';
+
+  const EXPECTED_ORIGIN = 'https://vivebharath.github.io';
+
 
   const getTargetWindow = () => {
     if (window.opener && !window.opener.closed) {
@@ -35,7 +39,7 @@ const App = () => {
     // Notify parent/opener that child is loaded
     targetWindow.postMessage(
       { type: 'CHILD_LOADED', timestamp: new Date().toISOString() },
-      PARENT_ORIGIN
+      PARENT_URL
     );
     console.log('Child window loaded and notified parent/opener');
   }, []);
@@ -43,7 +47,7 @@ const App = () => {
   useEffect(() => {
     const handleMessage = (event) => {
       // Security: Validate origin
-      if (event.origin !== PARENT_ORIGIN) {
+      if (event.origin !== EXPECTED_ORIGIN) {
         console.warn('Received message from untrusted origin:', event.origin);
         return;
       }
@@ -84,7 +88,7 @@ const App = () => {
     }
 
     console.log('Child sending form data:', message);
-    targetWindow.postMessage(message, PARENT_ORIGIN);
+    targetWindow.postMessage(message, PARENT_URL);
     setStatus('✅ Data sent to parent successfully!');
 
     // Reset form
