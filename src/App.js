@@ -38,9 +38,9 @@ const App = () => {
 
     // Notify parent/opener that child is loaded
     targetWindow.postMessage(
-      { type: 'CHILD_LOADED', timestamp: new Date().toISOString() },
-      PARENT_URL
-    );
+  { type: 'CHILD_LOADED', timestamp: new Date().toISOString() },
+  EXPECTED_ORIGIN // ✅ Correct: Just the origin
+);
     console.log('Child window loaded and notified parent/opener');
   }, []);
 
@@ -88,7 +88,7 @@ const App = () => {
     }
 
     console.log('Child sending form data:', message);
-    targetWindow.postMessage(message, PARENT_URL);
+    targetWindow.postMessage(message, EXPECTED_ORIGIN);
     setStatus('✅ Data sent to parent successfully!');
 
     // Reset form
