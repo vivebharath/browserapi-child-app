@@ -11,7 +11,7 @@ const App = () => {
   });
   const [parentData, setParentData] = useState(null);
 
-  const PARENT_ORIGIN = 'http://localhost:3000';
+  const PARENT_ORIGIN = 'https://vivebharath.github.io/browserapi-parent-app';
 
   const getTargetWindow = () => {
     if (window.opener && !window.opener.closed) {
