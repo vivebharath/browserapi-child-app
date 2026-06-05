@@ -78,9 +78,7 @@ const App = () => {
     console.log('Child sending form data:', message);
     targetWindow.postMessage(message, EXPECTED_ORIGIN);
     setStatus('✅ Data sent to parent successfully!');
-
-    // BUG FIX: Corrected typo 'whathappened' to 'whatHappened'
-    setFormData({ whatHappened: '', howDetected: '', whyIsItProblem: '' });
+    // setFormData({ whatHappened: '', howDetected: '', whyIsItProblem: '' });
   };
 
   return (
