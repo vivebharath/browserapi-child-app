@@ -1,31 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 
+// 🌐 ENVIRONMENT SETUP: Automatically detect Local vs Production
+const IS_LOCAL = window.location.hostname === 'localhost';
+const EXPECTED_ORIGIN = IS_LOCAL 
+  ? 'http://localhost:3000' 
+  : 'https://vivebharath.github.io';
+
 const App = () => {
   const [status, setStatus] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: ''
-  });
+  const [formData, setFormData] = useState({ whatHappened: '', whyIsItProblem: '', howDetected: '' });
   const [parentData, setParentData] = useState(null);
 
-  
-  const PARENT_URL = 'https://vivebharath.github.io/browserapi-parent-app';
-
-  const EXPECTED_ORIGIN = 'https://vivebharath.github.io';
-
-
   const getTargetWindow = () => {
+    // Desktop Tab detection
     if (window.opener && !window.opener.closed) {
       return window.opener;
     }
-
+    // Mobile Iframe detection
     if (window.parent && window.parent !== window) {
       return window.parent;
     }
-
     return null;
   };
 
@@ -36,17 +31,15 @@ const App = () => {
       return;
     }
 
-    // Notify parent/opener that child is loaded
     targetWindow.postMessage(
-  { type: 'CHILD_LOADED', timestamp: new Date().toISOString() },
-  EXPECTED_ORIGIN // ✅ Correct: Just the origin
-);
+      { type: 'CHILD_LOADED', timestamp: new Date().toISOString() },
+      EXPECTED_ORIGIN
+    );
     console.log('Child window loaded and notified parent/opener');
   }, []);
 
   useEffect(() => {
     const handleMessage = (event) => {
-      // Security: Validate origin
       if (event.origin !== EXPECTED_ORIGIN) {
         console.warn('Received message from untrusted origin:', event.origin);
         return;
@@ -57,6 +50,8 @@ const App = () => {
 
       if (data.type === 'PARENT_DATA') {
         setParentData(data.payload);
+        // BUG FIX: Use data.payload directly instead of stale state
+        setFormData(data.payload); 
       }
     };
 
@@ -66,10 +61,7 @@ const App = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -83,7 +75,7 @@ const App = () => {
     
     const targetWindow = getTargetWindow();
     if (!targetWindow) {
-      setStatus('⚠️ No parent window connected. Please open this page using the "Open Child in New Tab" button from the Parent App.');
+      setStatus('⚠️ No parent window connected.');
       return;
     }
 
@@ -91,83 +83,49 @@ const App = () => {
     targetWindow.postMessage(message, EXPECTED_ORIGIN);
     setStatus('✅ Data sent to parent successfully!');
 
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      message: ''
-    });
+    // BUG FIX: Corrected typo 'whathappened' to 'whatHappened'
+    setFormData({ whatHappened: '', howDetected: '', whyIsItProblem: '' });
   };
 
   return (
     <div className="app-container">
       <div className="header">
-        <h1>Child App - Simple Form</h1>
-        <p>Running on: http://localhost:3001</p>
+        <h1>Child App (Consider Like 5w2h AI coach)</h1>
+        <p>Running on: {IS_LOCAL ? 'Localhost' : 'Production'}</p>
       </div>
-
-      {parentData && (
-        <div className="parent-data-panel">
-          <h2>Data Received from Parent</h2>
-          <div className="data-display">
-            <p><strong>Title:</strong> {parentData.title || '(empty)'}</p>
-            <p><strong>Description:</strong> {parentData.description || '(empty)'}</p>
-            <p><strong>Value:</strong> {parentData.value || '(empty)'}</p>
-          </div>
-        </div>
-      )}
 
       <div className="form-container">
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name">Name:</label>
+            <label htmlFor="whatHappened">What happened?</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={formData.name}
+              id="whatHappened"
+              name="whatHappened"
+              value={formData.whatHappened}
               onChange={handleInputChange}
-              placeholder="Enter your name"
-            //   required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="whyIsItProblem">Why is it a Problem?</label>
             <input
               type="text"
-              id="email"
-              name="email"
-              value={formData.email}
+              id="whyIsItProblem"
+              name="whyIsItProblem"
+              value={formData.whyIsItProblem}
               onChange={handleInputChange}
-              placeholder="Enter your email"
-            //   required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="phone">Phone:</label>
+            <label htmlFor="howDetected">How detected?</label>
             <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
+              type="text"
+              id="howDetected"
+              name="howDetected"
+              value={formData.howDetected}
               onChange={handleInputChange}
-              placeholder="Enter your phone"
-            //   required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="message">Message:</label>
-            <textarea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={handleInputChange}
-              placeholder="Enter your message (optional)"
-              rows="4"
             />
           </div>
 
