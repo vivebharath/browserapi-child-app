@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 
-// 🌐 ENVIRONMENT SETUP: Automatically detect Local vs Production
 const IS_LOCAL = window.location.hostname === 'localhost';
 const EXPECTED_ORIGIN = IS_LOCAL 
   ? 'http://localhost:3000' 
@@ -10,7 +9,6 @@ const EXPECTED_ORIGIN = IS_LOCAL
 const App = () => {
   const [status, setStatus] = useState('');
   const [formData, setFormData] = useState({ whatHappened: '', whyIsItProblem: '', howDetected: '' });
-  const [parentData, setParentData] = useState(null);
 
   const getTargetWindow = () => {
     // Desktop Tab detection
@@ -49,8 +47,6 @@ const App = () => {
       console.log('Child received from parent:', data);
 
       if (data.type === 'PARENT_DATA') {
-        setParentData(data.payload);
-        // BUG FIX: Use data.payload directly instead of stale state
         setFormData(data.payload); 
       }
     };
